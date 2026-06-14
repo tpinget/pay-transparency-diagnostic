@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -c ' *)",
+      "Bash(which node *)",
+      "Bash(where node *)",
+      "Bash(where npm *)",
+      "Read(//c/Program Files/**)",
+      "Bash(python3 -m pip show esprima)",
+      "Bash(python3 -c \"import esprima\")",
+      "Bash(python3 -m pip install esprima)",
+      "Bash(unzip -l \"files \\(2\\).zip\")",
+      "Bash(unzip -p \"files \\(2\\).zip\" index.html)",
+      "Bash(mkdir -p /c/projet/claude-api/pay-transparency/Old/_tmp)",
+      "Bash(unzip -o \"files \\(2\\).zip\" -d /c/projet/claude-api/pay-transparency/Old/_tmp)",
+      "Bash(grep -viE \"^[<>]\\\\s*\\(//|/\\\\*|\\\\*\\)\")",
+      "Bash(grep -viE \"^[<>]\\\\s*\\(//|/\\\\*|\\\\*|\\\\s*$\\)\")",
+      "Bash(python -c ' *)",
+      "Bash(netstat -ano)",
+      "Bash(taskkill //PID 9760 //F)",
+      "Bash(taskkill //PID 6868 //F)",
+      "Bash(unzip -l \"Old/files \\(2\\).zip\")"
+    ]
+  }
+}

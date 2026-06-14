@@ -1,0 +1,7 @@
+.env
+*.json.export
+diagnostic_*.json
+__pycache__/
+claude/
+*.pyc
+.DS_Store

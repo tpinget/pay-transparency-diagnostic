@@ -1,0 +1,2110 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EU Pay Transparency Diagnostic</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --g-900: #173404;
+    --g-800: #27500A;
+    --g-700: #3B6D11;
+    --g-600: #639922;
+    --g-200: #C0DD97;
+    --g-100: #EAF3DE;
+    --g-50:  #F4FAF0;
+    --red:   #A32D2D;
+    --red-bg:#FCEBEB;
+    --amb:   #854F0B;
+    --amb-bg:#FAEEDA;
+    --gray:  #5F5E5A;
+    --gray-l:#F1EFE8;
+    --text:  #1a1a1a;
+    --text-s:#555;
+    --text-t:#888;
+    --border:#e0e0d8;
+    --bg:    #fff;
+    --bg-s:  #f8f8f5;
+    --radius:10px;
+    --radius-lg:14px;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 15px;
+    color: var(--text);
+    background: var(--bg-s);
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  .header {
+    background: var(--g-900);
+    color: white;
+    padding: 0;
+  }
+  .header-inner {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 1.75rem;
+  }
+  .header-eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--g-200);
+    margin-bottom: 0.5rem;
+  }
+  .header-title {
+    font-size: 26px;
+    font-weight: 600;
+    line-height: 1.25;
+    margin-bottom: 0.5rem;
+  }
+  .header-sub {
+    font-size: 14px;
+    color: var(--g-200);
+    line-height: 1.6;
+  }
+
+  /* ── Layout ── */
+  .main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+  }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--bg);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-s);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .card-title svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+  /* ── Screens ── */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ── Progress ── */
+  .progress-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 1.5rem;
+  }
+  .progress-track {
+    flex: 1;
+    height: 4px;
+    background: var(--g-100);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--g-700);
+    border-radius: 4px;
+    transition: width 0.4s ease;
+  }
+  .progress-label { font-size: 12px; color: var(--text-t); white-space: nowrap; }
+
+  /* ── Dim badge ── */
+  .dim-badge {
+    display: inline-block;
+    background: var(--g-100);
+    color: var(--g-800);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 6px;
+    margin-bottom: 0.75rem;
+  }
+
+  /* ── Question ── */
+  .question-text {
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.6;
+    margin-bottom: 1.25rem;
+    color: var(--text);
+  }
+  .options { display: grid; gap: 8px; }
+  .option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 14px;
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--text-s);
+    transition: border-color 0.15s, background 0.15s;
+    user-select: none;
+  }
+  .option:hover { border-color: var(--g-600); background: var(--g-50); }
+  .option.selected { border-color: var(--g-700); background: var(--g-100); color: var(--g-800); }
+  .option-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border);
+    flex-shrink: 0;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .option.selected .option-dot {
+    border-color: var(--g-700);
+    background: var(--g-700);
+  }
+  .option.selected .option-dot::after {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: white;
+    border-radius: 50%;
+  }
+
+  /* ── Nav buttons ── */
+  .nav-btns {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1.5rem;
+    gap: 12px;
+  }
+  .btn {
+    padding: 10px 20px;
+    border-radius: var(--radius);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: opacity 0.15s, transform 0.1s;
+  }
+  .btn:active { transform: scale(0.98); }
+  .btn-primary { background: var(--g-700); color: white; }
+  .btn-primary:hover { background: var(--g-800); }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-secondary {
+    background: var(--bg);
+    color: var(--text-s);
+    border: 0.5px solid var(--border);
+  }
+  .btn-secondary:hover { background: var(--bg-s); }
+
+  /* ── Form fields ── */
+  .field-group { margin-bottom: 1rem; }
+  .field-label {
+    font-size: 13px;
+    color: var(--text-s);
+    margin-bottom: 4px;
+    display: block;
+  }
+  input[type="text"],
+  input[type="number"],
+  select {
+    width: 100%;
+    padding: 9px 12px;
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 14px;
+    color: var(--text);
+    background: var(--bg);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  input:focus, select:focus { border-color: var(--g-700); }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  /* ── Country chips ── */
+  .country-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 6px;
+    margin-top: 0.5rem;
+  }
+  .chip {
+    padding: 6px 10px;
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 12px;
+    cursor: pointer;
+    color: var(--text-s);
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .chip:hover { border-color: var(--g-600); }
+  .chip.selected { border-color: var(--g-700); background: var(--g-100); color: var(--g-800); font-weight: 500; }
+  .chip-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border); flex-shrink: 0; }
+  .chip.selected .chip-dot { background: var(--g-700); }
+
+  /* ── Effectifs dynamiques ── */
+  #effectif-section { display: none; margin-top: 1rem; }
+  .effectif-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+  .effectif-row label { width: 120px; font-size: 13px; color: var(--text-s); flex-shrink: 0; }
+  .effectif-row input { flex: 1; }
+
+  /* ── Alert ── */
+  .alert {
+    display: flex;
+    gap: 10px;
+    padding: 12px 14px;
+    border-radius: var(--radius);
+    font-size: 13px;
+    line-height: 1.55;
+    margin-bottom: 1rem;
+  }
+  .alert-red { background: var(--red-bg); color: var(--red); }
+  .alert-green { background: var(--g-100); color: var(--g-800); }
+  .alert svg { width: 16px; height: 16px; flex-shrink: 0; margin-top: 1px; }
+
+  /* ── Hero stats ── */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 1.5rem;
+  }
+  .stat-box {
+    text-align: center;
+    padding: 1rem;
+    background: var(--bg-s);
+    border-radius: var(--radius);
+  }
+  .stat-num { font-size: 22px; font-weight: 600; color: var(--text); }
+  .stat-lbl { font-size: 12px; color: var(--text-t); margin-top: 2px; }
+
+  /* ── Loading ── */
+  .loading-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 3rem 1rem;
+    gap: 1rem;
+    text-align: center;
+  }
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--g-100);
+    border-top-color: var(--g-700);
+    border-radius: 50%;
+    animation: spin 0.9s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+    margin-top: 0.5rem;
+  }
+  .loading-tag {
+    font-size: 12px;
+    padding: 3px 10px;
+    background: var(--g-100);
+    color: var(--g-700);
+    border-radius: 6px;
+    animation: pulse 1.4s ease-in-out infinite;
+  }
+  .loading-tag:nth-child(2) { animation-delay: 0.2s; }
+  .loading-tag:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+
+  /* ── Rapport ── */
+  .score-hero {
+    text-align: center;
+    padding: 2rem;
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--bg);
+    margin-bottom: 1rem;
+  }
+  .score-num { font-size: 56px; font-weight: 600; color: var(--g-700); line-height: 1; }
+  .score-unit { font-size: 28px; }
+  .maturity-badge {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 5px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    background: var(--g-100);
+    color: var(--g-800);
+  }
+  .risque-label { font-size: 12px; color: var(--text-t); margin-top: 8px; }
+
+  /* Barres dimensions */
+  .dim-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    font-size: 13px;
+  }
+  .dim-bar-lbl { width: 180px; color: var(--text-s); flex-shrink: 0; }
+  .dim-bar-track {
+    flex: 1;
+    height: 8px;
+    background: var(--g-100);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .dim-bar-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; }
+  .dim-bar-pct { width: 36px; text-align: right; font-weight: 500; color: var(--text-s); }
+
+  /* Calendrier */
+  .cal-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .cal-table th {
+    text-align: left;
+    padding: 6px 8px;
+    color: var(--text-t);
+    font-weight: 500;
+    border-bottom: 0.5px solid var(--border);
+    font-size: 12px;
+  }
+  .cal-table td {
+    padding: 9px 8px;
+    border-bottom: 0.5px solid var(--border);
+    color: var(--text-s);
+    vertical-align: middle;
+  }
+  .pill {
+    display: inline-block;
+    padding: 2px 9px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .pill-red { background: var(--red-bg); color: var(--red); }
+  .pill-amb { background: var(--amb-bg); color: var(--amb); }
+  .pill-grn { background: var(--g-100); color: var(--g-800); }
+
+  /* Recommandations */
+  .reco-item {
+    display: flex;
+    gap: 12px;
+    padding: 12px;
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 8px;
+    background: var(--bg);
+  }
+  .reco-rank {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--g-700);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  .reco-title { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 3px; }
+  .reco-meta { font-size: 12px; color: var(--text-t); }
+
+  /* Synthèse + benchmark */
+  .prose { font-size: 14px; color: var(--text-s); line-height: 1.7; }
+
+  /* Points forts */
+  .point-fort {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--text-s);
+    margin-bottom: 6px;
+  }
+  .point-fort-dot { color: var(--g-700); font-size: 16px; flex-shrink: 0; }
+
+  /* Rapport header */
+  .rapport-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .rapport-meta { font-size: 12px; color: var(--text-t); }
+
+  /* Section title */
+  .section-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-s);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* Error */
+  .error-msg {
+    background: var(--red-bg);
+    color: var(--red);
+    padding: 12px 16px;
+    border-radius: var(--radius);
+    font-size: 13px;
+    margin-top: 1rem;
+    display: none;
+  }
+
+  /* API key input screen */
+  .api-note { font-size: 13px; color: var(--text-t); margin-top: 6px; line-height: 1.5; }
+
+  /* ── Stepper ── */
+  .stepper {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 1.5rem;
+  }
+  .step-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    position: relative;
+    cursor: default;
+  }
+  .step-item:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    top: 14px;
+    left: 50%;
+    width: 100%;
+    height: 2px;
+    background: var(--border);
+    z-index: 0;
+  }
+  .step-item.done:not(:last-child)::after { background: var(--g-600); }
+  .step-bubble {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    background: var(--bg);
+    color: var(--text-t);
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .step-item.active .step-bubble {
+    border-color: var(--g-700);
+    background: var(--g-700);
+    color: white;
+  }
+  .step-item.done .step-bubble {
+    border-color: var(--g-600);
+    background: var(--g-100);
+    color: var(--g-800);
+  }
+  .step-label {
+    font-size: 10px;
+    color: var(--text-t);
+    margin-top: 4px;
+    text-align: center;
+    line-height: 1.3;
+    max-width: 70px;
+  }
+  .step-item.active .step-label { color: var(--g-700); font-weight: 500; }
+  .step-item.done .step-label { color: var(--g-600); }
+
+  /* ── Likert survey table ── */
+  .likert-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+  .likert-table thead tr {
+    background: var(--g-50);
+    border-bottom: 0.5px solid var(--border);
+  }
+  .likert-table th {
+    padding: 10px 6px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--g-800);
+    text-align: center;
+    vertical-align: middle;
+    line-height: 1.3;
+  }
+  .likert-q-col { width: 46%; text-align: left !important; padding-left: 16px !important; }
+  .likert-table th:not(.likert-q-col) { width: 13.5%; }
+
+  .likert-table tbody tr {
+    border-bottom: 0.5px solid var(--border);
+    transition: background 0.12s;
+  }
+  .likert-table tbody tr:last-child { border-bottom: none; }
+  .likert-table tbody tr:hover { background: var(--g-50); }
+  .likert-table tbody tr.answered { background: var(--g-50); }
+
+  .likert-q-cell {
+    padding: 13px 12px 13px 16px;
+    font-size: 13px;
+    color: var(--text-s);
+    line-height: 1.5;
+    vertical-align: middle;
+  }
+  .likert-radio-cell {
+    text-align: center;
+    vertical-align: middle;
+    padding: 10px 6px;
+    cursor: pointer;
+  }
+  .likert-radio-cell:hover .likert-dot { border-color: var(--g-600); background: var(--g-50); }
+
+  .likert-dot {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border);
+    background: var(--bg);
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    cursor: pointer;
+  }
+  .likert-dot.selected {
+    border-color: var(--g-700);
+    background: var(--g-700);
+  }
+  .likert-dot.selected::after {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: white;
+  }
+
+  /* ── Streaming analysis panel ── */
+  .stream-panel {
+    margin-top: 1rem;
+    border: 0.5px solid var(--g-200);
+    border-radius: var(--radius-lg);
+    background: var(--g-50);
+    overflow: hidden;
+    display: none;
+  }
+  .stream-panel.visible { display: block; }
+  .stream-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    background: var(--g-100);
+    border-bottom: 0.5px solid var(--g-200);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--g-800);
+  }
+  .stream-header .stream-spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--g-200);
+    border-top-color: var(--g-700);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    flex-shrink: 0;
+  }
+  .stream-header .stream-spinner.done { display: none; }
+  .stream-body {
+    padding: 14px 16px;
+    font-size: 14px;
+    color: var(--text-s);
+    line-height: 1.7;
+    min-height: 48px;
+    white-space: pre-wrap;
+  }
+  .stream-cursor {
+    display: inline-block;
+    width: 2px;
+    height: 14px;
+    background: var(--g-700);
+    vertical-align: middle;
+    margin-left: 1px;
+    animation: blink 0.9s step-end infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+  .stream-followup {
+    padding: 10px 16px 14px;
+    border-top: 0.5px solid var(--g-200);
+    display: none;
+  }
+  .stream-followup.visible { display: block; }
+  .followup-question {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--g-800);
+    margin-bottom: 8px;
+  }
+  .followup-choices { display: flex; flex-wrap: wrap; gap: 6px; }
+  .followup-chip {
+    padding: 5px 12px;
+    border: 0.5px solid var(--g-600);
+    border-radius: 20px;
+    font-size: 12px;
+    color: var(--g-700);
+    cursor: pointer;
+    background: var(--bg);
+    transition: all 0.15s;
+  }
+  .followup-chip:hover { background: var(--g-100); }
+  .followup-chip.selected { background: var(--g-700); color: white; border-color: var(--g-700); }
+
+  @media (max-width: 620px) {
+    .likert-table th:not(.likert-q-col) { font-size: 9px; }
+    .likert-q-cell { font-size: 12px; padding: 10px 8px 10px 12px; }
+    .likert-dot { width: 18px; height: 18px; }
+    .field-row { grid-template-columns: 1fr; }
+    .stats-row { grid-template-columns: 1fr 1fr; }
+    .dim-bar-lbl { width: 120px; font-size: 12px; }
+    .header-title { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-inner">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1rem;">
+      <div class="header-eyebrow" data-i18n="header_eyebrow" style="margin-bottom:0">Directive EU 2023/970</div>
+      <select id="lang-switcher" onchange="switchLang(this.value)" style="width:auto;padding:3px 4px;border:0.5px solid rgba(255,255,255,0.25);border-radius:6px;font-size:12px;background:var(--g-800);cursor:pointer;color:white;outline:none;">
+        <option value="fr" style="background:#1a1a1a;color:white;">FR</option>
+        <option value="en" style="background:#1a1a1a;color:white;">EN</option>
+        <option value="de" style="background:#1a1a1a;color:white;">DE</option>
+        <option value="es" style="background:#1a1a1a;color:white;">ES</option>
+        <option value="nl" style="background:#1a1a1a;color:white;">NL</option>
+      </select>
+    </div>
+    <div class="header-title" data-i18n="header_title">EU Pay Transparency<br>Diagnostic</div>
+    <div class="header-sub" data-i18n="header_sub">Évaluez la maturité de votre organisation en moins de 15 minutes.</div>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- SCREEN 0: API Key -->
+<div class="screen active" id="screen-apikey">
+  <div class="card">
+    <div class="card-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z"/></svg>
+      <span data-i18n="apikey_title">Clé API Anthropic</span>
+    </div>
+
+    <!-- Detecting server key — shown during async init -->
+    <div id="detecting-banner" style="display:flex;align-items:center;gap:10px;padding:8px 0;color:var(--text-t);font-size:13px;">
+      <div class="spinner" style="width:18px;height:18px;border-width:2px;"></div>
+      <span>Initialisation…</span>
+    </div>
+
+    <!-- Server key detected — shown when serve.py is running with .env key -->
+    <div id="server-key-banner" style="display:none">
+      <div class="alert alert-green" style="margin-bottom:1rem">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span data-i18n="apikey_server_found">Clé API détectée sur le serveur — aucune saisie requise.</span>
+      </div>
+      <button class="btn btn-primary" onclick="goTo('accueil')" style="width:100%" data-i18n="apikey_btn">Continuer →</button>
+    </div>
+
+    <!-- Manual key input — shown when no server key or running as standalone HTML -->
+    <div id="manual-key-form" style="display:none">
+      <div class="field-group">
+        <label class="field-label" data-i18n="apikey_label">Entrez votre clé API Claude</label>
+        <input type="text" id="apikey-input" data-i18n-placeholder="apikey_placeholder" placeholder="sk-ant-api03-..." autocomplete="off">
+        <div class="api-note" data-i18n="apikey_note">Votre clé n'est pas stockée — elle est utilisée uniquement pour cet appel.</div>
+      </div>
+      <div class="alert alert-red" id="apikey-error" style="display:none">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+        <span data-i18n="apikey_error">Clé invalide ou manquante. Format attendu : sk-ant-...</span>
+      </div>
+      <div style="margin-top:0.75rem;">
+        <button class="btn btn-primary" onclick="validerCle()" style="width:100%" data-i18n="apikey_btn">Continuer →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 1: Welcome -->
+<div class="screen" id="screen-accueil">
+  <div class="stats-row">
+    <div class="stat-box"><div class="stat-num">27</div><div class="stat-lbl" data-i18n="stat_questions">questions</div></div>
+    <div class="stat-box"><div class="stat-num">5</div><div class="stat-lbl" data-i18n="stat_dimensions">dimensions</div></div>
+    <div class="stat-box"><div class="stat-num">&lt;15 min</div><div class="stat-lbl" data-i18n="stat_duration">durée estimée</div></div>
+  </div>
+  <div class="alert alert-red">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+    <span data-i18n="welcome_alert">Le droit d'accès à l'information salariale est exigible au <strong>7 juin 2026</strong>.</span>
+  </div>
+  <button class="btn btn-primary" onclick="goTo('perimetre')" style="width:100%;padding:14px;font-size:15px" data-i18n="welcome_start">Démarrer le diagnostic →</button>
+</div>
+
+<!-- SCREEN 2: Scope -->
+<div class="screen" id="screen-perimetre">
+  <div class="card">
+    <div class="card-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21"/></svg>
+      <span data-i18n="scope_org_title">Identité de l'organisation</span>
+    </div>
+    <div class="field-group">
+      <label class="field-label" data-i18n="scope_name_label">Nom de l'organisation</label>
+      <input type="text" id="org-nom" data-i18n-placeholder="scope_name_placeholder" placeholder="Ex. : Groupe Mercator SA">
+    </div>
+    <div class="field-row">
+      <div class="field-group">
+        <label class="field-label" data-i18n="scope_sector_label">Secteur d'activité</label>
+        <select id="org-secteur" data-i18n-options="sectors"></select>
+      </div>
+      <div class="field-group">
+        <label class="field-label" data-i18n="scope_legal_label">Forme juridique</label>
+        <select id="org-forme" data-i18n-options="legal_forms"></select>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
+      <span data-i18n="scope_countries_title">Pays couverts par le diagnostic</span>
+    </div>
+    <div style="font-size:12px;color:var(--text-t);margin-bottom:10px" data-i18n="scope_countries_hint">Sélectionnez tous les pays où votre organisation emploie des salariés</div>
+    <div class="country-grid" id="country-grid"></div>
+    <div id="effectif-section" style="display:none">
+      <div style="margin-top:1.25rem;margin-bottom:0.75rem;font-size:13px;font-weight:600;color:var(--text-s)" data-i18n="scope_headcount_title">Effectifs par pays sélectionné</div>
+      <div id="effectif-fields"></div>
+      <div class="effectif-row" style="margin-top:8px;padding-top:10px;border-top:0.5px solid var(--border)">
+        <label data-i18n="scope_total_label">Effectif total groupe</label>
+        <input type="number" id="effectif-total" data-i18n-placeholder="scope_total_placeholder" placeholder="Ex. : 1 240" min="1">
+      </div>
+    </div>
+  </div>
+  <div class="nav-btns">
+    <button class="btn btn-secondary" onclick="goTo('accueil')" data-i18n="nav_back">← Retour</button>
+    <button class="btn btn-primary" onclick="validerPerimetre()" data-i18n="nav_continue">Continuer →</button>
+  </div>
+</div>
+
+<!-- SCREEN 3: Questionnaire — Likert survey table, one dimension at a time -->
+<div class="screen" id="screen-questionnaire">
+
+  <!-- Step indicator — one bubble per dimension -->
+  <div class="stepper" id="stepper"></div>
+
+  <!-- Dimension header -->
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+    <div>
+      <div class="dim-badge" id="q-dim-badge"></div>
+      <div style="font-size:13px;color:var(--text-s);margin-top:4px" id="q-dim-desc"></div>
+    </div>
+    <div style="text-align:right">
+      <div style="font-size:11px;color:var(--text-t)" data-i18n="q_progress_label">Avancement</div>
+      <div style="font-size:22px;font-weight:600;color:var(--g-700)" id="live-global">0%</div>
+    </div>
+  </div>
+
+  <!-- Likert table -->
+  <div class="card" style="padding:0;overflow:hidden;">
+    <table class="likert-table" id="likert-table">
+      <thead>
+        <tr>
+          <th class="likert-q-col"></th>
+          <th id="lh-0"></th>
+          <th id="lh-1"></th>
+          <th id="lh-2"></th>
+          <th id="lh-3"></th>
+        </tr>
+      </thead>
+      <tbody id="likert-body"></tbody>
+    </table>
+  </div>
+
+  <!-- Streaming analysis panel — shown after dimension is complete -->
+  <div class="stream-panel" id="stream-panel">
+    <div class="stream-header">
+      <div class="stream-spinner" id="stream-spinner"></div>
+      <span id="stream-header-text" data-i18n="stream_analyzing">Analyse Claude en cours…</span>
+    </div>
+    <div class="stream-body" id="stream-body">
+      <span class="stream-cursor" id="stream-cursor"></span>
+    </div>
+    <div class="stream-followup" id="stream-followup">
+      <div class="followup-question" id="followup-question"></div>
+      <div class="followup-choices" id="followup-choices"></div>
+    </div>
+  </div>
+
+  <div class="nav-btns" style="margin-top:1rem;">
+    <button class="btn btn-secondary" id="btn-prev" onclick="naviguerDimension(-1)" data-i18n="nav_prev">← Précédent</button>
+    <div style="font-size:12px;color:var(--text-t);align-self:center" id="q-counter"></div>
+    <button class="btn btn-primary" id="btn-next" onclick="naviguerDimension(1)" disabled data-i18n="nav_next">Suivant →</button>
+  </div>
+</div>
+
+<!-- SCREEN 4: Loading -->
+<div class="screen" id="screen-chargement">
+  <div class="card">
+    <div class="loading-center">
+      <div class="spinner"></div>
+      <div style="font-size:16px;font-weight:500" data-i18n="loading_title">Analyse en cours…</div>
+      <div style="font-size:14px;color:var(--text-s);max-width:320px;line-height:1.6" data-i18n="loading_sub">Claude analyse vos 27 réponses et calcule votre positionnement réglementaire par pays.</div>
+      <div class="loading-tags">
+        <span class="loading-tag" data-i18n="loading_tag1">Scoring 5 dimensions</span>
+        <span class="loading-tag" id="loading-pays">Calendrier réglementaire</span>
+        <span class="loading-tag" data-i18n="loading_tag3">3 recommandations prioritaires</span>
+      </div>
+    </div>
+    <div class="error-msg" id="api-error" data-i18n="api_error_msg">Erreur lors de l'appel à l'API Claude.</div>
+  </div>
+</div>
+
+<!-- SCREEN 5: Report -->
+<div class="screen" id="screen-rapport">
+  <div class="rapport-header">
+    <div class="rapport-meta" id="rapport-meta">—</div>
+    <button class="btn btn-secondary" onclick="window.print()" style="font-size:12px" data-i18n="report_print">↓ Imprimer / PDF</button>
+  </div>
+  <div class="score-hero">
+    <div style="font-size:12px;color:var(--text-t);margin-bottom:0.5rem" data-i18n="report_score_label">Score de maturité global</div>
+    <div class="score-num"><span id="r-score">—</span><span class="score-unit">%</span></div>
+    <div class="maturity-badge" id="r-niveau">—</div>
+    <div class="risque-label" data-i18n="report_risk_label">Risque réglementaire : <span id="r-risque" style="font-weight:600">—</span></div>
+  </div>
+  <div class="card">
+    <div class="section-title" data-i18n="report_dim_title">Score par dimension</div>
+    <div id="r-dims"></div>
+  </div>
+  <div class="card">
+    <div class="section-title" data-i18n="report_exec_title">Synthèse executive</div>
+    <div class="prose" id="r-synthese">—</div>
+  </div>
+  <div class="card">
+    <div class="section-title" data-i18n="report_cal_title">Calendrier réglementaire par pays</div>
+    <table class="cal-table">
+      <thead><tr>
+        <th data-i18n="cal_country">Pays</th>
+        <th data-i18n="cal_headcount">Effectif</th>
+        <th data-i18n="cal_obligation">Obligation</th>
+        <th data-i18n="cal_deadline">Échéance</th>
+        <th data-i18n="cal_status">Statut</th>
+      </tr></thead>
+      <tbody id="r-calendrier"></tbody>
+    </table>
+  </div>
+  <div class="card">
+    <div class="section-title" data-i18n="report_reco_title">3 recommandations prioritaires</div>
+    <div id="r-recos"></div>
+  </div>
+  <div class="card">
+    <div class="section-title" data-i18n="report_strengths_title">Points forts identifiés</div>
+    <div id="r-points"></div>
+  </div>
+  <div class="card">
+    <div class="section-title" data-i18n="report_bench_title">Benchmark sectoriel</div>
+    <div class="prose" id="r-bench-txt">—</div>
+  </div>
+  <button class="btn btn-secondary" onclick="recommencer()" style="width:100%;margin-top:0.5rem" data-i18n="report_restart">← Nouveau diagnostic</button>
+</div>
+
+</div><!-- /.main -->
+
+<script>
+// ─── App configuration ───
+// This single script drives the whole prototype: i18n setup, scope/perimeter
+// capture, the 27-question Likert flow, live web-search scope resolution,
+// per-dimension streaming analysis, and the final Claude-generated report.
+const MODEL        = "claude-sonnet-4-6";
+const TODAY        = new Date();
+const TODAY_ISO    = TODAY.toISOString().split("T")[0];
+const API_BASE     = window.location.origin;
+// file:// has no server to proxy through, so standalone mode talks to the
+// Anthropic API directly from the browser using a user-supplied key (see README).
+const USE_PROXY    = !window.location.protocol.startsWith("file");
+// Cap on how long the first dimension's stream waits for scope resolution
+// (web search) before proceeding without it — see awaitScopeContext().
+const SCOPE_WAIT_TIMEOUT_MS = 4000;
+
+// ─── Server-side key detection ───
+let serverHasKey = false;
+
+async function detectServerKey() {
+  try {
+    if (!USE_PROXY) {
+      serverHasKey = false;
+      showManualKeyForm();
+      return;
+    }
+    const resp = await fetch(API_BASE + "/api/config", {
+      signal: AbortSignal.timeout(1500)
+    });
+    if (resp.ok) {
+      const data = await resp.json();
+      serverHasKey = data.has_key === true;
+    } else {
+      serverHasKey = false;
+    }
+  } catch (_) {
+    serverHasKey = false;
+  } finally {
+    if (serverHasKey) {
+      showServerKeyBanner();
+    } else {
+      showManualKeyForm();
+    }
+  }
+}
+
+function hideDetecting() {
+  const el = document.getElementById("detecting-banner");
+  if (el) el.style.display = "none";
+}
+
+function showServerKeyBanner() {
+  hideDetecting();
+  document.getElementById("server-key-banner").style.display = "block";
+  document.getElementById("manual-key-form").style.display   = "none";
+}
+
+function showManualKeyForm() {
+  hideDetecting();
+  document.getElementById("server-key-banner").style.display = "none";
+  document.getElementById("manual-key-form").style.display   = "block";
+}
+
+// ─── i18n ───
+// Locale files: /locales/{fr,en,de,es,nl}.json (served by serve.py)
+// Fallback: fr + en embedded for standalone file:// mode
+const TRANSLATIONS = {};
+
+const SUPPORTED_LANGS = ["fr", "en", "de", "es", "nl"];
+
+// Embedded copy of locales/fr.json and locales/en.json, kept manually in sync.
+// Used in standalone (file://) mode where fetch("/locales/*.json") cannot work,
+// and as a last-resort fallback if a locale file fails to load in server mode.
+const FALLBACK = {
+  fr: {"header_eyebrow": "Directive EU 2023/970", "header_title": "EU Pay Transparency<br>Diagnostic", "header_sub": "Évaluez la maturité de votre organisation en moins de 15 minutes. Obtenez un rapport de scoring personnalisé et vos priorités d'action.", "apikey_title": "Clé API Anthropic", "apikey_label": "Entrez votre clé API Claude", "apikey_placeholder": "sk-ant-api03-...", "apikey_note": "Votre clé n'est pas stockée — elle est utilisée uniquement pour cet appel.", "apikey_server_found": "Clé API détectée sur le serveur — aucune saisie requise.", "sidebar_scores": "Scores en cours", "sidebar_global": "Score global", "q_progress_label": "Avancement", "apikey_error": "Clé invalide ou manquante. Format attendu : sk-ant-...", "apikey_btn": "Continuer →", "stat_questions": "questions", "stat_dimensions": "dimensions", "stat_duration": "durée estimée", "welcome_alert": "Le droit d'accès à l'information salariale est exigible au <strong>7 juin 2026</strong> pour toutes les entreprises UE.", "welcome_start": "Démarrer le diagnostic →", "scope_org_title": "Identité de l'organisation", "scope_name_label": "Nom de l'organisation", "scope_name_placeholder": "Ex. : Groupe Mercator SA", "scope_sector_label": "Secteur d'activité", "scope_legal_label": "Forme juridique", "scope_countries_title": "Pays couverts par le diagnostic", "scope_countries_hint": "Sélectionnez tous les pays où votre organisation emploie des salariés", "scope_headcount_title": "Effectifs par pays sélectionné", "scope_total_label": "Effectif total groupe", "scope_total_placeholder": "Ex. : 1 240", "scope_headcount_placeholder": "Ex. : 150", "scope_err_name": "Veuillez saisir le nom de l'organisation.", "scope_err_country": "Sélectionnez au moins un pays.", "scope_err_headcount": "Veuillez saisir un effectif valide pour", "nav_back": "← Retour", "nav_continue": "Continuer →", "nav_prev": "← Précédent", "nav_next": "Suivant →", "nav_analyze": "Analyser →", "q_dimension_label": "Dimension", "loading_title": "Analyse en cours…", "loading_sub": "Claude analyse vos 27 réponses et calcule votre positionnement réglementaire par pays.", "loading_tag1": "Scoring 5 dimensions", "loading_tag3": "3 recommandations prioritaires", "loading_calendar": "Calendrier", "api_error_msg": "Erreur lors de l'appel à l'API Claude. Vérifiez votre clé et rechargez la page.", "report_score_label": "Score de maturité global", "report_risk_label": "Risque réglementaire :", "report_dim_title": "Score par dimension", "report_exec_title": "Synthèse executive", "report_cal_title": "Calendrier réglementaire par pays", "report_reco_title": "3 recommandations prioritaires", "report_strengths_title": "Points forts identifiés", "report_bench_title": "Benchmark sectoriel", "report_print": "↓ Imprimer / PDF", "report_restart": "← Nouveau diagnostic", "cal_country": "Pays", "cal_headcount": "Effectif", "cal_obligation": "Obligation", "cal_deadline": "Échéance", "cal_status": "Statut", "status_critical": "CRITIQUE", "status_attention": "ATTENTION", "status_ok": "OK", "status_overdue": "DÉPASSÉE", "status_in_scope": "EN VIGUEUR", "status_anticipation": "ANTICIPATION", "status_not_yet_in_scope": "PAS ENCORE CONCERNÉ", "reco_impact": "Impact", "reco_timeline": "Délai", "options": ["Non / Pas du tout", "En réflexion / Prévu", "Partiellement en place", "Oui / Pleinement opérationnel"], "sectors": ["Sélectionner…", "Industrie & Manufacturing", "Services professionnels", "Finance & Assurance", "Retail & Distribution", "Santé & Pharmaceutique", "Secteur public", "Tech & Digital", "Énergie & Environnement", "Transport & Logistique", "Autre"], "legal_forms": ["Sélectionner…", "Groupe international", "Entreprise nationale", "ETI (250–4999 sal.)", "PME (<250 sal.)", "Association / Fondation", "Secteur public"], "dimensions": [{"id": "governance", "label": "Gouvernance & Politique salariale", "weight": 0.2, "questions": ["Votre organisation dispose-t-elle d'une politique de rémunération écrite et approuvée par la direction ?", "Cette politique inclut-elle des critères objectifs de fixation et d'évolution des salaires ?", "Un responsable nommément désigné pilote-t-il le sujet de l'équité salariale ?", "Le COMEX a-t-il été formellement informé des exigences de la Directive EU 2023/970 ?", "Votre organisation a-t-elle réalisé une analyse d'impact réglementaire sur ce sujet ?", "Existe-t-il un budget alloué à la mise en conformité Pay Transparency pour 2024–2026 ?"]}, {"id": "structures", "label": "Structures & Classifications", "weight": 0.25, "questions": ["Votre organisation utilise-t-elle un système formel de classification des emplois (niveaux, grades, bandes) ?", "Les critères de classification sont-ils documentés et exempts de biais de genre identifiés ?", "Les intitulés de poste reflètent-ils fidèlement le périmètre réel des fonctions exercées ?", "Avez-vous réalisé une cartographie des emplois à valeur égale ou comparable ?", "Vos grilles salariales sont-elles documentées par niveau/grade avec fourchettes définies ?", "Les fourchettes salariales sont-elles communiquées aux candidats lors du recrutement ?"]}, {"id": "data", "label": "Données & Reporting", "weight": 0.25, "questions": ["Votre SIRH permet-il d'extraire les données de rémunération ventilées par genre ?", "Calculez-vous déjà un indicateur d'écart de rémunération (gender pay gap) ?", "Cet indicateur est-il calculé selon la méthodologie exigée par la Directive (médiane + moyenne) ?", "Vos données de rémunération sont-elles suffisamment fiables et à jour pour un reporting externe ?", "Avez-vous un processus de reporting RH régulier incluant des indicateurs d'équité salariale ?"]}, {"id": "employee_rights", "label": "Droits des salariés & Transparence interne", "weight": 0.15, "questions": ["Les salariés peuvent-ils accéder sur demande aux critères qui déterminent leur rémunération ?", "Existe-t-il un processus formalisé de réponse aux demandes d'information salariale ?", "Les managers sont-ils formés à expliquer les décisions de rémunération à leurs équipes ?", "Votre organisation dispose-t-elle d'un mécanisme de recours en cas de discrimination salariale perçue ?", "Les offres d'emploi publiées mentionnent-elles une fourchette de rémunération ou le salaire initial ?"]}, {"id": "remediation", "label": "Remédiation & Maturité opérationnelle", "weight": 0.15, "questions": ["Avez-vous identifié les écarts de rémunération inexpliqués au sein de votre organisation ?", "Un plan d'action correctif est-il en place pour résorber les écarts identifiés ?", "Votre organisation a-t-elle déjà communiqué en externe sur ses indicateurs d'équité salariale ?", "Des audits conjoints avec les représentants du personnel sont-ils prévus ou en cours ?", "Votre organisation se considère-t-elle prête à un contrôle de conformité d'ici {deadline} ?"]}], "claude_lang_instruction": "Réponds en français.", "stream_analyzing": "Analyse des réponses…", "stream_done": "Remarques", "stream_followup_intro": "Pour approfondir :", "deadline_generic": "l'échéance réglementaire applicable"},
+  en: {"header_eyebrow": "EU Directive 2023/970", "header_title": "EU Pay Transparency<br>Diagnostic", "header_sub": "Assess your organisation's maturity in under 15 minutes. Get a personalised scoring report and priority actions.", "apikey_title": "Anthropic API Key", "apikey_label": "Enter your Claude API key", "apikey_placeholder": "sk-ant-api03-...", "apikey_note": "Your key is not stored — it is used only for this single API call.", "apikey_server_found": "API key detected on the server — no input required.", "sidebar_scores": "Live scores", "sidebar_global": "Global score", "q_progress_label": "Progress", "apikey_error": "Invalid or missing key. Expected format: sk-ant-...", "apikey_btn": "Continue →", "stat_questions": "questions", "stat_dimensions": "dimensions", "stat_duration": "estimated time", "welcome_alert": "The right to salary information access is mandatory by <strong>7 June 2026</strong> for all EU organisations.", "welcome_start": "Start the diagnostic →", "scope_org_title": "Organisation identity", "scope_name_label": "Organisation name", "scope_name_placeholder": "e.g. Mercator Group Ltd", "scope_sector_label": "Industry sector", "scope_legal_label": "Legal form", "scope_countries_title": "Countries covered by the diagnostic", "scope_countries_hint": "Select all countries where your organisation employs staff", "scope_headcount_title": "Headcount by selected country", "scope_total_label": "Total group headcount", "scope_total_placeholder": "e.g. 1,240", "scope_headcount_placeholder": "e.g. 150", "scope_err_name": "Please enter the organisation name.", "scope_err_country": "Please select at least one country.", "scope_err_headcount": "Please enter a valid headcount for", "nav_back": "← Back", "nav_continue": "Continue →", "nav_prev": "← Previous", "nav_next": "Next →", "nav_analyze": "Analyse →", "q_dimension_label": "Dimension", "loading_title": "Analysing…", "loading_sub": "Claude is analysing your 27 answers and computing your regulatory positioning by country.", "loading_tag1": "Scoring 5 dimensions", "loading_tag3": "3 priority recommendations", "loading_calendar": "Calendar", "api_error_msg": "Error calling the Claude API. Check your key and reload the page.", "report_score_label": "Global maturity score", "report_risk_label": "Regulatory risk:", "report_dim_title": "Score by dimension", "report_exec_title": "Executive summary", "report_cal_title": "Regulatory calendar by country", "report_reco_title": "Top 3 priority recommendations", "report_strengths_title": "Identified strengths", "report_bench_title": "Sector benchmark", "report_print": "↓ Print / PDF", "report_restart": "← New diagnostic", "cal_country": "Country", "cal_headcount": "Headcount", "cal_obligation": "Obligation", "cal_deadline": "Deadline", "cal_status": "Status", "status_critical": "CRITICAL", "status_attention": "ATTENTION", "status_ok": "OK", "status_overdue": "OVERDUE", "status_in_scope": "IN SCOPE", "status_anticipation": "ANTICIPATION", "status_not_yet_in_scope": "NOT YET IN SCOPE", "reco_impact": "Impact", "reco_timeline": "Timeline", "options": ["No / Not at all", "Under consideration / Planned", "Partially in place", "Yes / Fully operational"], "sectors": ["Select…", "Industry & Manufacturing", "Professional Services", "Finance & Insurance", "Retail & Distribution", "Healthcare & Pharma", "Public Sector", "Tech & Digital", "Energy & Environment", "Transport & Logistics", "Other"], "legal_forms": ["Select…", "International group", "National company", "Mid-sized enterprise", "SME (<250 emp.)", "Association / Foundation", "Public sector"], "dimensions": [{"id": "governance", "label": "Governance & Pay Policy", "weight": 0.2, "questions": ["Does your organisation have a written pay policy formally approved by leadership?", "Does this policy include objective criteria for setting and evolving salaries?", "Is a named individual responsible for driving pay equity within your organisation?", "Has the executive committee been formally briefed on EU Directive 2023/970 requirements?", "Has your organisation conducted a regulatory impact assessment on pay transparency?", "Is a dedicated budget allocated for pay transparency compliance for 2024–2026?"]}, {"id": "structures", "label": "Structures & Job Classification", "weight": 0.25, "questions": ["Does your organisation use a formal job classification system (levels, grades, bands)?", "Are classification criteria documented and free from identified gender bias?", "Do job titles accurately reflect the actual scope of responsibilities?", "Have you mapped jobs of equal or comparable value across your organisation?", "Are salary grids documented by level/grade with defined pay ranges?", "Are salary ranges communicated to candidates at the recruitment stage?"]}, {"id": "data", "label": "Data & Reporting", "weight": 0.25, "questions": ["Does your HRIS allow extraction of compensation data broken down by gender?", "Do you already calculate a gender pay gap indicator?", "Is this indicator calculated using the Directive's required methodology (median + mean)?", "Is your compensation data reliable and current enough for external reporting?", "Do you have a regular HR reporting process that includes pay equity indicators?"]}, {"id": "employee_rights", "label": "Employee Rights & Internal Transparency", "weight": 0.15, "questions": ["Can employees access on request the criteria used to determine their pay?", "Is there a formalised process for responding to salary information requests?", "Are managers trained to explain pay decisions to their teams?", "Does your organisation have a grievance mechanism for perceived pay discrimination?", "Do published job postings include a salary range or starting pay?"]}, {"id": "remediation", "label": "Remediation & Operational Maturity", "weight": 0.15, "questions": ["Have you identified unexplained pay gaps within your organisation?", "Is a corrective action plan in place to close identified pay gaps?", "Has your organisation already published external pay equity indicators?", "Are joint audits with employee representatives planned or underway?", "Does your organisation consider itself ready for a compliance review by {deadline}?"]}], "claude_lang_instruction": "Respond in English.", "stream_analyzing": "Analysing responses…", "stream_done": "Remarks", "stream_followup_intro": "To go deeper:", "deadline_generic": "the applicable regulatory deadline"},
+};
+
+function detectLanguage() {
+  const candidates = navigator.languages
+    ? [...navigator.languages]
+    : [navigator.language || "fr"];
+  for (const lang of candidates) {
+    const code = lang.split("-")[0].toLowerCase();
+    if (SUPPORTED_LANGS.includes(code)) return code;
+  }
+  return "fr";
+}
+
+let currentLang = detectLanguage();
+
+async function loadLocale(lang) {
+  if (TRANSLATIONS[lang]) return;
+  if (!USE_PROXY) {
+    TRANSLATIONS[lang] = FALLBACK[lang] || FALLBACK["fr"];
+    return;
+  }
+  try {
+    const resp = await fetch("/locales/" + lang + ".json", {
+      signal: AbortSignal.timeout(1000)
+    });
+    if (!resp.ok) throw new Error("HTTP " + resp.status);
+    TRANSLATIONS[lang] = await resp.json();
+  } catch (e) {
+    console.warn("Locale " + lang + " not loaded: " + e.message);
+    TRANSLATIONS[lang] = FALLBACK[lang] || FALLBACK["fr"];
+  }
+}
+
+// Looks up `key` in the active language, falling back to French (the
+// source language all other locales are translated from), then to the
+// raw key itself so a missing translation is visible rather than blank.
+function t(key) {
+  return (TRANSLATIONS[currentLang] && TRANSLATIONS[currentLang][key])
+    || (TRANSLATIONS["fr"] && TRANSLATIONS["fr"][key])
+    || key;
+}
+
+function applyTranslations() {
+  document.querySelectorAll("[data-i18n]").forEach(function(el) {
+    const val = t(el.dataset.i18n);
+    if (val) el.innerHTML = val;
+  });
+  document.querySelectorAll("[data-i18n-placeholder]").forEach(function(el) {
+    const val = t(el.dataset.i18nPlaceholder);
+    if (val) el.placeholder = val;
+  });
+  document.querySelectorAll("[data-i18n-options]").forEach(function(sel) {
+    const options = t(sel.dataset.i18nOptions);
+    if (Array.isArray(options)) {
+      sel.innerHTML = options.map(function(o, i) {
+        return '<option value="' + (i === 0 ? "" : o) + '">' + o + "</option>";
+      }).join("");
+    }
+  });
+  document.documentElement.lang = currentLang;
+  const switcher = document.getElementById("lang-switcher");
+  if (switcher) switcher.value = currentLang;
+}
+
+async function switchLang(lang) {
+  currentLang = lang;
+  await loadLocale(lang);
+  applyTranslations();
+  buildCountryChips();
+  rebuildQuestionList();
+}
+
+// ─── Static data — countries and obligations ───
+
+const PAYS_NAMES = {
+  FR:{fr:"France",     en:"France",       de:"Frankreich",   es:"Francia",       nl:"Frankrijk"},
+  DE:{fr:"Allemagne",  en:"Germany",      de:"Deutschland",  es:"Alemania",      nl:"Duitsland"},
+  BE:{fr:"Belgique",   en:"Belgium",      de:"Belgien",      es:"Bélgica",       nl:"België"},
+  NL:{fr:"Pays-Bas",   en:"Netherlands",  de:"Niederlande",  es:"Países Bajos",  nl:"Nederland"},
+  ES:{fr:"Espagne",    en:"Spain",        de:"Spanien",      es:"España",        nl:"Spanje"},
+  IT:{fr:"Italie",     en:"Italy",        de:"Italien",      es:"Italia",        nl:"Italië"},
+  PL:{fr:"Pologne",    en:"Poland",       de:"Polen",        es:"Polonia",       nl:"Polen"},
+  SE:{fr:"Suède",      en:"Sweden",       de:"Schweden",     es:"Suecia",        nl:"Zweden"},
+  PT:{fr:"Portugal",   en:"Portugal",     de:"Portugal",     es:"Portugal",      nl:"Portugal"},
+  AT:{fr:"Autriche",   en:"Austria",      de:"Österreich",   es:"Austria",       nl:"Oostenrijk"},
+  DK:{fr:"Danemark",   en:"Denmark",      de:"Dänemark",     es:"Dinamarca",     nl:"Denemarken"},
+  FI:{fr:"Finlande",   en:"Finland",      de:"Finnland",     es:"Finlandia",     nl:"Finland"},
+  LU:{fr:"Luxembourg", en:"Luxembourg",   de:"Luxemburg",    es:"Luxemburgo",    nl:"Luxemburg"},
+  IE:{fr:"Irlande",    en:"Ireland",      de:"Irland",       es:"Irlanda",       nl:"Ierland"},
+  CZ:{fr:"Tchéquie",   en:"Czechia",      de:"Tschechien",   es:"Chequia",       nl:"Tsjechië"},
+  RO:{fr:"Roumanie",   en:"Romania",      de:"Rumänien",     es:"Rumanía",       nl:"Roemenië"},
+  HU:{fr:"Hongrie",    en:"Hungary",      de:"Ungarn",       es:"Hungría",       nl:"Hongarije"},
+  SK:{fr:"Slovaquie",  en:"Slovakia",     de:"Slowakei",     es:"Eslovaquia",    nl:"Slowakije"},
+  HR:{fr:"Croatie",    en:"Croatia",      de:"Kroatien",     es:"Croacia",       nl:"Kroatië"},
+  SI:{fr:"Slovénie",   en:"Slovenia",     de:"Slowenien",    es:"Eslovenia",     nl:"Slovenië"},
+  GR:{fr:"Grèce",      en:"Greece",       de:"Griechenland", es:"Grecia",        nl:"Griekenland"},
+  EE:{fr:"Estonie",    en:"Estonia",      de:"Estland",      es:"Estonia",       nl:"Estland"},
+  LV:{fr:"Lettonie",   en:"Latvia",       de:"Lettland",     es:"Letonia",       nl:"Letland"},
+  LT:{fr:"Lituanie",   en:"Lithuania",    de:"Litauen",      es:"Lituania",      nl:"Litouwen"},
+};
+const PAYS = Object.keys(PAYS_NAMES).map(function(code) { return { code: code, name: code }; });
+
+function countryName(code) {
+  return (PAYS_NAMES[code] && PAYS_NAMES[code][currentLang]) || PAYS_NAMES[code]["fr"] || code;
+}
+
+// ─── Runtime state ───
+let apiKey       = "";
+let perimetre    = {};
+let selectedPays = new Set();
+let answers      = {};
+let currentQ     = 0;
+let allQuestions = [];
+let scores       = {};
+let currentDim   = 0;
+const dimFollowups = {};
+const streamedDims = {};
+// Per-dimension streamed analysis text (set in streamDimensionAnalysis),
+// fed into the final report prompt in runAnalysis() so the synthesis
+// builds on what was already said per dimension.
+const dimAnalyses  = {};
+
+// Resolved live via web search per country — see resolveScopeContext()
+let scopeContext        = {};
+let scopeContextPromise = null;
+
+// ─── Question list builder ───
+function rebuildQuestionList() {
+  allQuestions = [];
+  const dims = t("dimensions");
+  if (!Array.isArray(dims)) return;
+  dims.forEach(function(dim, di) {
+    if (!answers[dim.id]) {
+      answers[dim.id] = new Array(dim.questions.length).fill(null);
+    }
+    dim.questions.forEach(function(q, qi) {
+      allQuestions.push({ dimIndex: di, dimId: dim.id, dimLabel: dim.label, qIndex: qi, text: q });
+    });
+  });
+}
+
+// ─── Screen navigation ───
+function goTo(id) {
+  document.querySelectorAll(".screen").forEach(function(s) { s.classList.remove("active"); });
+  document.getElementById("screen-" + id).classList.add("active");
+  window.scrollTo(0, 0);
+}
+
+// ─── Step 0: API key ───
+function validerCle() {
+  if (serverHasKey) { goTo("accueil"); return; }
+  const k = document.getElementById("apikey-input").value.trim();
+  if (!k.startsWith("sk-ant-")) {
+    document.getElementById("apikey-error").style.display = "flex";
+    return;
+  }
+  document.getElementById("apikey-error").style.display = "none";
+  apiKey = k;
+  goTo("accueil");
+}
+
+// ─── Country chips ───
+function buildCountryChips() {
+  const grid = document.getElementById("country-grid");
+  if (!grid) return;
+  grid.innerHTML = "";
+  PAYS.forEach(function(p) {
+    const chip = document.createElement("div");
+    chip.className = "chip" + (selectedPays.has(p.code) ? " selected" : "");
+    chip.dataset.code = p.code;
+    chip.innerHTML = '<div class="chip-dot"></div>' + countryName(p.code);
+    chip.onclick = function() { togglePays(p.code, chip); };
+    grid.appendChild(chip);
+  });
+}
+buildCountryChips();
+
+function togglePays(code, el) {
+  if (selectedPays.has(code)) {
+    selectedPays.delete(code);
+    el.classList.remove("selected");
+  } else {
+    selectedPays.add(code);
+    el.classList.add("selected");
+  }
+  updateEffectifFields();
+}
+
+function updateEffectifFields() {
+  const section = document.getElementById("effectif-section");
+  const fields  = document.getElementById("effectif-fields");
+  if (selectedPays.size === 0) { section.style.display = "none"; return; }
+  section.style.display = "block";
+  fields.innerHTML = "";
+  selectedPays.forEach(function(code) {
+    const row = document.createElement("div");
+    row.className = "effectif-row";
+    const ph = t("scope_headcount_placeholder");
+    row.innerHTML = '<label>' + countryName(code) + '</label>' +
+      '<input type="number" id="eff-' + code + '" placeholder="' + ph + '" min="1">';
+    fields.appendChild(row);
+  });
+}
+
+// ─── Scope validation ───
+function validerPerimetre() {
+  const nom = document.getElementById("org-nom").value.trim();
+  if (!nom) { alert(t("scope_err_name")); return; }
+  if (selectedPays.size === 0) { alert(t("scope_err_country")); return; }
+
+  const paysEffectifs = {};
+  let ok = true;
+  selectedPays.forEach(function(code) {
+    const el = document.getElementById("eff-" + code);
+    const v  = parseInt((el && el.value) || "0");
+    if (!v || v < 1) { alert(t("scope_err_headcount") + " " + code + "."); ok = false; }
+    else paysEffectifs[code] = v;
+  });
+  if (!ok) return;
+
+  const totalInput = document.getElementById("effectif-total");
+  const total = parseInt((totalInput && totalInput.value) || "0")
+    || Object.values(paysEffectifs).reduce(function(a, b) { return a + b; }, 0);
+
+  perimetre = {
+    nom: nom,
+    secteur: (document.getElementById("org-secteur") && document.getElementById("org-secteur").value) || "—",
+    paysEffectifs: paysEffectifs,
+    effectifTotal: total,
+    date: TODAY_ISO,
+    lang: currentLang,
+  };
+  // Kick off the web-search scope resolution now, without waiting for it:
+  // it runs in the background while the user answers the 27 questions, and
+  // is awaited later by streamDimensionAnalysis() / runAnalysis().
+  scopeContext        = {};
+  scopeContextPromise = resolveAllScopeContexts(paysEffectifs);
+
+  const loadingPays = document.getElementById("loading-pays");
+  if (loadingPays) loadingPays.textContent = t("loading_calendar") + " " + Object.keys(paysEffectifs).join(" · ");
+
+  const dims = t("dimensions");
+  if (Array.isArray(dims)) {
+    dims.forEach(function(dim) {
+      answers[dim.id] = new Array(dim.questions.length).fill(null);
+    });
+  }
+  rebuildQuestionList();
+  currentDim = 0;
+  goTo("questionnaire");
+  renderDimension(0);
+}
+
+// ─── Organisational scope — resolved live via web search ───
+// IMPORTANT: no transposition date or deadline is ever hardcoded in this app.
+// For each country/headcount pair, resolveScopeContext() asks Claude (with the
+// web_search tool enabled) to look up the current EU Directive 2023/970
+// transposition status and applicable deadline. The result is cached in
+// scopeContext and injected into every later prompt via buildScopeBlock().
+
+// Standalone (file://) mode calls api.anthropic.com directly with the user's
+// own key; server mode proxies through serve.py, which holds the key.
+function buildScopeAuthHeaders() {
+  const headers = { "Content-Type": "application/json" };
+  if (!USE_PROXY || !serverHasKey) {
+    headers["x-api-key"]   = apiKey;
+    headers["anthropic-version"] = "2023-06-01";
+    headers["anthropic-dangerous-direct-browser-access"] = "true";
+  }
+  return headers;
+}
+
+async function resolveScopeContext(countryCode, headcount) {
+  const cName     = countryName(countryCode);
+  const langInstr = t("claude_lang_instruction") || "Respond in English.";
+
+  const fallback = {
+    transposition_status:   "—",
+    applicable_deadline:    "—",
+    country_specific_rules: "—",
+    status:                 "NOT_YET_IN_SCOPE",
+  };
+
+  const systemPrompt =
+    "You are a regulatory research assistant specialised in the EU Pay Transparency Directive (2023/970).\n" +
+    "Use the web_search tool to verify current, factual information before answering — do not rely on memorised dates.\n" +
+    langInstr + "\n\n" +
+    "ABSOLUTE RULES:\n" +
+    "- Respond ONLY with a valid JSON object. No markdown, no code fences, no text before or after.\n" +
+    "- The JSON must be directly parsable by JSON.parse() and have exactly these fields:\n" +
+    '  {"transposition_status": "string", "applicable_deadline": "string", "country_specific_rules": "string", "status": "IN_SCOPE|ANTICIPATION|NOT_YET_IN_SCOPE"}\n' +
+    "- \"status\" reflects whether the organisation is currently within the obligation's scope:\n" +
+    "  IN_SCOPE = the applicable deadline has already passed or falls within the next 6 months,\n" +
+    "  ANTICIPATION = the deadline is more than 6 months but less than 3 years away,\n" +
+    "  NOT_YET_IN_SCOPE = no deadline currently applies (e.g. headcount threshold not met, or 3+ years away).";
+
+  const userPrompt =
+    "Today's date is " + TODAY_ISO + ".\n" +
+    "For the EU Pay Transparency Directive 2023/970, what is the transposition status in " + cName +
+    " as of today (transposed, in progress, deadline missed, etc.)? What is the applicable compliance " +
+    "deadline for a company with " + headcount + " employees in " + cName + " under the directive's " +
+    "thresholds (>250 / 100-249 / <100 employees)? Are there any country-specific rules stricter than " +
+    "the directive (earlier deadlines, lower thresholds, sector exceptions)? Use web search to confirm " +
+    "current information before answering.";
+
+  try {
+    const endpoint = (USE_PROXY && serverHasKey)
+      ? (API_BASE + "/api/scope")
+      : "https://api.anthropic.com/v1/messages";
+
+    const response = await fetch(endpoint, {
+      method:  "POST",
+      headers: buildScopeAuthHeaders(),
+      body:    JSON.stringify({
+        model:      MODEL,
+        max_tokens: 1500,
+        system:     systemPrompt,
+        messages:   [{ role: "user", content: userPrompt }],
+        tools:      [{ type: "web_search_20250305", name: "web_search", max_uses: 3 }],
+      }),
+    });
+    if (!response.ok) throw new Error("API " + response.status);
+
+    const data = await response.json();
+    // With web_search enabled, content[] also contains server_tool_use /
+    // web_search_tool_result blocks — the JSON answer is in the last text block.
+    const textBlocks = (data.content || []).filter(function(b) { return b.type === "text"; });
+    if (!textBlocks.length) throw new Error("No text content in response");
+
+    let raw = textBlocks[textBlocks.length - 1].text.trim();
+    // After searching, Claude sometimes wraps the JSON in commentary or
+    // ```json fences despite the "no markdown" rule — extract the outermost
+    // {...} object rather than relying on a strict format.
+    const start = raw.indexOf("{");
+    const end   = raw.lastIndexOf("}");
+    if (start !== -1 && end !== -1 && end > start) raw = raw.slice(start, end + 1);
+    const parsed = JSON.parse(raw.trim());
+
+    return {
+      transposition_status:   parsed.transposition_status   || fallback.transposition_status,
+      applicable_deadline:    parsed.applicable_deadline    || fallback.applicable_deadline,
+      country_specific_rules: parsed.country_specific_rules || fallback.country_specific_rules,
+      status: ["IN_SCOPE", "ANTICIPATION", "NOT_YET_IN_SCOPE"].includes(parsed.status)
+        ? parsed.status
+        : fallback.status,
+    };
+  } catch (err) {
+    console.warn("Scope resolution failed for " + countryCode + ":", err.message);
+    return fallback;
+  }
+}
+
+async function resolveAllScopeContexts(paysEffectifs) {
+  const entries = Object.entries(paysEffectifs);
+  // Write each country's result into scopeContext as soon as it resolves,
+  // rather than waiting for every country — so a fast country is already
+  // usable by awaitScopeContext() even before the slowest one finishes.
+  await Promise.all(entries.map(function(entry) {
+    return resolveScopeContext(entry[0], entry[1]).then(function(ctx) {
+      scopeContext[entry[0]] = ctx;
+    });
+  }));
+  return scopeContext;
+}
+
+// The first dimension's stream starts right after validerPerimetre() kicks
+// off resolveAllScopeContexts() — a web-search round trip that can easily
+// take longer than answering 6 Likert questions. Waiting for it fully would
+// make the first stream much slower than the rest. Instead, give it a short
+// budget: if scope resolution isn't done by then, proceed with whatever
+// per-country results have landed so far (buildScopeBlock degrades
+// gracefully with "—" placeholders for unresolved countries). Later
+// dimensions call this too, but by then scopeContextPromise has normally
+// long since settled, so this resolves immediately.
+function awaitScopeContext() {
+  if (!scopeContextPromise) return Promise.resolve();
+  return Promise.race([
+    scopeContextPromise,
+    new Promise(function(resolve) { setTimeout(resolve, SCOPE_WAIT_TIMEOUT_MS); }),
+  ]);
+}
+
+// Plain-language description of the IN_SCOPE/ANTICIPATION/NOT_YET_IN_SCOPE
+// enum used internally (see resolveScopeContext). Used in buildScopeBlock()
+// so Claude reasons about a sentence rather than an enum constant — without
+// this, Claude sometimes echoed the raw "NOT_YET_IN_SCOPE"-style code
+// verbatim into the executive summary / recommendations.
+function describeScopeStatus(status) {
+  switch (status) {
+    case "IN_SCOPE":         return "in scope — the applicable deadline has already passed or falls within the next 6 months";
+    case "ANTICIPATION":     return "anticipation phase — the applicable deadline is more than 6 months but less than 3 years away";
+    case "NOT_YET_IN_SCOPE": return "not yet in scope — no compliance deadline currently applies for this country/headcount";
+    default:                 return "—";
+  }
+}
+
+// Builds the structured "--- ORGANIZATIONAL SCOPE ---" block(s) injected
+// at the top of every system prompt sent to Claude for analysis.
+function buildScopeBlock() {
+  return Object.entries(perimetre.paysEffectifs || {}).map(function(entry) {
+    const code      = entry[0];
+    const headcount = entry[1];
+    const ctx       = scopeContext[code] || {};
+    return "--- ORGANIZATIONAL SCOPE ---\n" +
+      "Country: " + countryName(code) + "\n" +
+      "Headcount: " + headcount + "\n" +
+      "Transposition status: " + (ctx.transposition_status || "—") + "\n" +
+      "Applicable deadline: " + (ctx.applicable_deadline || "—") + "\n" +
+      "Country-specific rules: " + (ctx.country_specific_rules || "—") + "\n" +
+      "Status: " + describeScopeStatus(ctx.status) + "\n" +
+      "----------------------------";
+  }).join("\n\n");
+}
+
+// Picks the most pressing applicable_deadline across the selected countries,
+// for use in question text that must reference "the" compliance deadline
+// without hardcoding a date (see resolveQuestionText / {deadline} placeholder).
+// Priority: IN_SCOPE > ANTICIPATION > any resolved deadline. Falls back to a
+// generic localised phrase if scope resolution hasn't produced a usable
+// deadline yet (e.g. still running, or NOT_YET_IN_SCOPE for every country).
+function computeNearestDeadlineLabel() {
+  const entries = Object.entries(perimetre.paysEffectifs || {});
+  const order   = { IN_SCOPE: 0, ANTICIPATION: 1 };
+  let best = null;
+  entries.forEach(function(entry) {
+    const code = entry[0];
+    const ctx  = scopeContext[code] || {};
+    if (!ctx.applicable_deadline || ctx.applicable_deadline === "—") return;
+    const rank = order.hasOwnProperty(ctx.status) ? order[ctx.status] : 2;
+    if (!best || rank < best.rank) best = { code: code, deadline: ctx.applicable_deadline, rank: rank };
+  });
+  if (!best) return t("deadline_generic");
+  return entries.length > 1
+    ? best.deadline + " (" + countryName(best.code) + ")"
+    : best.deadline;
+}
+
+// Substitutes the {deadline} placeholder (if present) in a question's text
+// with the live-resolved deadline for the current scope. Used both when
+// rendering the questionnaire and when sending question text to Claude, so
+// the wording stays consistent everywhere.
+function resolveQuestionText(qText) {
+  if (qText.indexOf("{deadline}") === -1) return qText;
+  return qText.replace("{deadline}", computeNearestDeadlineLabel());
+}
+
+// ─── Stepper ───
+function buildStepper(activeDimIndex) {
+  const stepper = document.getElementById("stepper");
+  if (!stepper) return;
+  const dims = t("dimensions");
+  if (!Array.isArray(dims)) return;
+  stepper.innerHTML = "";
+  dims.forEach(function(dim, i) {
+    const isDone   = i < activeDimIndex;
+    const isActive = i === activeDimIndex;
+    const item = document.createElement("div");
+    item.className = "step-item" + (isDone ? " done" : "") + (isActive ? " active" : "");
+    const shortLabel = dim.label.split(/[\s&]/)[0];
+    item.innerHTML = '<div class="step-bubble">' + (isDone ? "✓" : i + 1) + "</div>" +
+      '<div class="step-label">' + shortLabel + "</div>";
+    stepper.appendChild(item);
+  });
+}
+
+// ─── Progress ───
+function computeGlobalLive() {
+  const dims = t("dimensions");
+  if (!Array.isArray(dims)) return 0;
+  let answered = 0, total = 0;
+  dims.forEach(function(dim) {
+    const reps = answers[dim.id] || [];
+    total    += dim.questions.length;
+    answered += reps.filter(function(r) { return r !== null; }).length;
+  });
+  return total > 0 ? Math.round(answered / total * 100) : 0;
+}
+
+// ─── Likert table renderer ───
+function renderDimension(dimIndex) {
+  currentDim = dimIndex;
+  const dims  = t("dimensions");
+  if (!Array.isArray(dims)) return;
+  const dim   = dims[dimIndex];
+  const opts  = t("options");
+  const total = dims.length;
+
+  buildStepper(dimIndex);
+
+  const badge = document.getElementById("q-dim-badge");
+  if (badge) badge.textContent = dim.label;
+
+  const counter = document.getElementById("q-counter");
+  if (counter) counter.textContent = (dimIndex + 1) + " / " + total;
+
+  const globalEl = document.getElementById("live-global");
+  if (globalEl) {
+    const g = computeGlobalLive();
+    globalEl.textContent = g > 0 ? g + "%" : "—";
+  }
+
+  if (Array.isArray(opts)) {
+    opts.forEach(function(label, i) {
+      const th = document.getElementById("lh-" + i);
+      if (th) th.textContent = label;
+    });
+  }
+
+  const tbody = document.getElementById("likert-body");
+  if (!tbody) return;
+  tbody.innerHTML = "";
+
+  dim.questions.forEach(function(qText, qi) {
+    const currentVal = (answers[dim.id] && answers[dim.id][qi] !== undefined) ? answers[dim.id][qi] : null;
+    const tr = document.createElement("tr");
+    if (currentVal !== null) tr.classList.add("answered");
+
+    const tdQ = document.createElement("td");
+    tdQ.className   = "likert-q-cell";
+    tdQ.textContent = resolveQuestionText(qText);
+    tr.appendChild(tdQ);
+
+    if (Array.isArray(opts)) {
+      opts.forEach(function(_, val) {
+        const td  = document.createElement("td");
+        td.className    = "likert-radio-cell";
+        td.dataset.val  = val;
+        td.dataset.qi   = qi;
+        td.dataset.dim  = dim.id;
+        const dot = document.createElement("div");
+        dot.className   = "likert-dot" + (currentVal === val ? " selected" : "");
+        td.appendChild(dot);
+        tr.appendChild(td);
+      });
+    }
+    tbody.appendChild(tr);
+  });
+
+  // Single delegated listener — clone to prevent stacking
+  const newTbody = tbody.cloneNode(true);
+  tbody.parentNode.replaceChild(newTbody, tbody);
+  newTbody.addEventListener("click", function(e) {
+    const td = e.target.closest("td[data-val]");
+    if (!td) return;
+    const row = td.closest("tr");
+    const val = parseInt(td.dataset.val);
+    selectLikert(td.dataset.dim, parseInt(td.dataset.qi), val, row);
+    row.querySelectorAll(".likert-dot").forEach(function(d, i) {
+      d.classList.toggle("selected", i === val);
+    });
+  });
+
+  const btnPrev = document.getElementById("btn-prev");
+  const btnNext = document.getElementById("btn-next");
+  if (btnPrev) {
+    btnPrev.disabled    = dimIndex === 0;
+    btnPrev.textContent = t("nav_prev");
+  }
+  if (btnNext) {
+    btnNext.disabled    = !isDimComplete(dim.id);
+    btnNext.textContent = dimIndex === total - 1 ? t("nav_analyze") : t("nav_next");
+  }
+}
+
+function isDimComplete(dimId) {
+  const reps = answers[dimId] || [];
+  return reps.length > 0 && reps.every(function(r) { return r !== null; });
+}
+
+function selectLikert(dimId, qi, val, tr) {
+  if (!answers[dimId]) answers[dimId] = [];
+  answers[dimId][qi] = val;
+  tr.classList.add("answered");
+  const complete = isDimComplete(dimId);
+  const btnNext = document.getElementById("btn-next");
+  if (btnNext) btnNext.disabled = !complete;
+  const globalEl = document.getElementById("live-global");
+  if (globalEl) globalEl.textContent = computeGlobalLive() + "%";
+  // Start the streaming analysis as soon as the dimension's last answer is
+  // given (not on "Next" click) so the user can read it before navigating away.
+  // streamedDims guards against re-triggering if they revisit answers.
+  if (complete && !streamedDims[dimId]) {
+    streamDimensionAnalysis(currentDim);
+  }
+}
+
+// ─── Streaming dimension analysis ───
+
+function buildStreamSystemPrompt() {
+  const lang      = t("claude_lang_instruction") || "Respond in French.";
+  const scopeBlock = buildScopeBlock();
+  return (scopeBlock ? scopeBlock + "\n\n" : "") +
+    "You are an expert in HR regulatory compliance, specialised in EU Directive 2023/970.\n" +
+    "You analyse a single dimension of a pay transparency maturity diagnostic.\n" +
+    lang + "\n\n" +
+    "YOUR TASK:\n" +
+    "1. Write 3-4 sentences analysing the dimension answers: identify the strongest gap,\n" +
+    "   explain its regulatory consequence with explicit reference to the organisational scope\n" +
+    "   above (applicable deadline, transposition status, country-specific rules, and compliance\n" +
+    "   status), and give one concrete insight. Be direct and CHRO-oriented.\n\n" +
+    "2. If you detect a significant gap (any answer scored 0 or 1 on a key question),\n" +
+    "   append a follow-up question block at the very end:\n" +
+    "   |||FOLLOWUP|||\n" +
+    '   {"question": "...", "choices": ["...", "...", "..."]}\n' +
+    "   |||END|||\n" +
+    "   The question must clarify the root cause. Choices: 2-4 short options (max 8 words each).\n" +
+    "   If no significant gap, omit the FOLLOWUP block.\n\n" +
+    "RULES: Start directly with the analysis. Keep under 120 words. Ground your analysis in the\n" +
+    "organisational scope block above — never invent dates or statuses not provided there.\n" +
+    "Describe the compliance status in plain language for a CHRO audience — never write internal\n" +
+    "labels such as \"in scope\", \"anticipation phase\" or \"not yet in scope\" as standalone jargon;\n" +
+    "explain what it means for the organisation instead.";
+}
+
+function buildStreamUserPrompt(dim, dimAnswers, dimScore) {
+  const opts = t("options");
+  const lines = dim.questions.map(function(q, i) {
+    const val   = (dimAnswers[i] !== undefined && dimAnswers[i] !== null) ? dimAnswers[i] : null;
+    const label = (val !== null && Array.isArray(opts)) ? opts[val] : "not answered";
+    return "Q" + (i + 1) + ". " + resolveQuestionText(q) + "\n   Score: " + (val !== null ? val + "/3 (" + label + ")" : "?");
+  }).join("\n");
+  return "DIMENSION: " + dim.label + "\n" +
+    "Score: " + dimScore + "% (weight " + Math.round(dim.weight * 100) + "%)\n\n" +
+    lines + "\n\nAnalyse this dimension and identify the key gap if any.";
+}
+
+// The streamed response is plain text, optionally followed by a custom
+// |||FOLLOWUP|||{...json...}|||END||| block (see buildStreamSystemPrompt).
+// These delimiters let a single SSE text stream carry both the free-form
+// analysis and a structured follow-up question without a second API call.
+function parseStreamOutput(fullText) {
+  const marker    = "|||FOLLOWUP|||";
+  const endMarker = "|||END|||";
+  const idx = fullText.indexOf(marker);
+  if (idx === -1) return { analysis: fullText.trim(), followup: null };
+  const analysis   = fullText.slice(0, idx).trim();
+  const jsonStart  = idx + marker.length;
+  const jsonEnd    = fullText.indexOf(endMarker, jsonStart);
+  const jsonStr    = jsonEnd > -1 ? fullText.slice(jsonStart, jsonEnd).trim() : fullText.slice(jsonStart).trim();
+  try {
+    return { analysis: analysis, followup: JSON.parse(jsonStr) };
+  } catch (_) {
+    return { analysis: analysis, followup: null };
+  }
+}
+
+function renderFollowup(dimId, followup) {
+  const section  = document.getElementById("stream-followup");
+  const qEl      = document.getElementById("followup-question");
+  const chipsEl  = document.getElementById("followup-choices");
+  if (!section || !qEl || !chipsEl || !followup) return;
+  qEl.textContent  = followup.question;
+  chipsEl.innerHTML = "";
+  (followup.choices || []).forEach(function(choice) {
+    const chip = document.createElement("div");
+    chip.className   = "followup-chip";
+    chip.textContent = choice;
+    chip.onclick = function() {
+      chipsEl.querySelectorAll(".followup-chip").forEach(function(c) { c.classList.remove("selected"); });
+      chip.classList.add("selected");
+      dimFollowups[dimId] = { question: followup.question, answer: choice };
+    };
+    chipsEl.appendChild(chip);
+  });
+  section.classList.add("visible");
+}
+
+async function streamDimensionAnalysis(dimIndex) {
+  const dims       = t("dimensions");
+  if (!Array.isArray(dims)) return;
+  const dim        = dims[dimIndex];
+  streamedDims[dim.id] = true;
+  const dimAnswers = answers[dim.id] || [];
+  const reps       = dimAnswers.filter(function(r) { return r !== null; });
+  const dimScore   = reps.length
+    ? Math.round(reps.reduce(function(a, b) { return a + b; }, 0) / (reps.length * 3) * 100)
+    : 0;
+
+  const panel      = document.getElementById("stream-panel");
+  const bodyEl     = document.getElementById("stream-body");
+  const spinner    = document.getElementById("stream-spinner");
+  const headerText = document.getElementById("stream-header-text");
+  const cursor     = document.getElementById("stream-cursor");
+  const followup   = document.getElementById("stream-followup");
+
+  if (!panel || !bodyEl) return;
+
+  panel.classList.add("visible");
+  if (followup) followup.classList.remove("visible");
+  bodyEl.innerHTML = "";
+  if (cursor) bodyEl.appendChild(cursor);
+  if (spinner) spinner.classList.remove("done");
+  if (headerText) headerText.textContent = t("stream_analyzing");
+
+  const btnNext = document.getElementById("btn-next");
+  if (btnNext) btnNext.disabled = true;
+
+  let fullText = "";
+
+  try {
+    // Per-dimension streaming is proxy-only: standalone (file://) mode has no
+    // SSE relay, so it skips straight to the questionnaire without this
+    // intermediate analysis (the final report in runAnalysis() still works).
+    if (!USE_PROXY || !serverHasKey) {
+      if (panel) panel.classList.remove("visible");
+      if (btnNext) btnNext.disabled = false;
+      return;
+    }
+
+    await awaitScopeContext();
+
+    const resp = await fetch("/api/stream", {
+      method:  "POST",
+      headers: { "Content-Type": "application/json" },
+      body:    JSON.stringify({
+        model:      "claude-sonnet-4-6",
+        max_tokens: 800,
+        system:     buildStreamSystemPrompt(),
+        messages:   [{ role: "user", content: buildStreamUserPrompt(dim, dimAnswers, dimScore) }],
+      }),
+    });
+    if (!resp.ok) throw new Error("HTTP " + resp.status);
+
+    const reader  = resp.body.getReader();
+    const decoder = new TextDecoder();
+    let   buffer  = "";
+
+    while (true) {
+      const chunk = await reader.read();
+      if (chunk.done) break;
+      buffer += decoder.decode(chunk.value, { stream: true });
+      const lines = buffer.split("\n");
+      buffer = lines.pop();
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        if (!line.startsWith("data:")) continue;
+        const dataStr = line.slice(5).trim();
+        if (!dataStr) continue;
+        try {
+          const event = JSON.parse(dataStr);
+          if (event.type === "text_delta") {
+            fullText += event.text;
+            const displayText = fullText.split("|||FOLLOWUP|||")[0];
+            bodyEl.textContent = displayText;
+            if (cursor) bodyEl.appendChild(cursor);
+          } else if (event.type === "done") {
+            break;
+          } else if (event.type === "error") {
+            throw new Error(event.message);
+          }
+        } catch (_) {}
+      }
+    }
+
+  } catch (err) {
+    console.warn("Stream error:", err.message);
+    bodyEl.textContent = "";
+  } finally {
+    if (cursor && cursor.parentNode) cursor.parentNode.removeChild(cursor);
+    if (spinner) spinner.classList.add("done");
+    if (headerText) headerText.textContent = t("stream_done");
+    const parsed = parseStreamOutput(fullText);
+    if (bodyEl) bodyEl.textContent = parsed.analysis;
+    if (parsed.analysis) dimAnalyses[dim.id] = parsed.analysis;
+    if (parsed.followup) renderFollowup(dim.id, parsed.followup);
+    if (btnNext) btnNext.disabled = false;
+  }
+}
+
+// ─── Dimension navigation ───
+function naviguerDimension(dir) {
+  const dims = t("dimensions");
+  if (!Array.isArray(dims)) return;
+  const next = currentDim + dir;
+  if (dir < 0) {
+    if (next < 0) return;
+    hidStreamPanel();
+    renderDimension(next);
+    return;
+  }
+  if (next >= dims.length) {
+    rebuildQuestionList();
+    runAnalysis();
+    return;
+  }
+  const dimId = dims[currentDim].id;
+  // Normal case: the analysis already streamed in when the last answer was
+  // given (see selectLikert). Only stream here as a fallback if the user
+  // somehow reaches "Next" without it having run yet.
+  if (streamedDims[dimId]) {
+    hidStreamPanel();
+    renderDimension(next);
+  } else {
+    streamDimensionAnalysis(currentDim).then(function() {
+      hidStreamPanel();
+      renderDimension(next);
+    });
+  }
+}
+
+function hidStreamPanel() {
+  const panel = document.getElementById("stream-panel");
+  if (panel) panel.classList.remove("visible");
+}
+
+function renderQuestion(index) {
+  const q = allQuestions[index];
+  currentQ = index;
+  renderDimension(q.dimIndex);
+}
+
+function selectAnswer(val, el, container) {}
+function naviguerQuestion(dir) { naviguerDimension(dir); }
+
+// ─── Score computation ───
+function computeScores() {
+  let global = 0;
+  const dims = {};
+  t("dimensions").forEach(function(dim) {
+    const reps = (answers[dim.id] || []).filter(function(r) { return r !== null; });
+    const s    = reps.length
+      ? Math.round(reps.reduce(function(a, b) { return a + b; }, 0) / (reps.length * 3) * 1000) / 10
+      : 0;
+    dims[dim.id] = { label: dim.label, score: s, weight: dim.weight };
+    global += s * dim.weight;
+  });
+  return { global: Math.round(global * 10) / 10, dimensions: dims };
+}
+
+// ─── Claude API call — final report ───
+async function runAnalysis() {
+  scores = computeScores();
+  goTo("chargement");
+  const errEl = document.getElementById("api-error");
+  if (errEl) errEl.style.display = "none";
+
+  if (scopeContextPromise) await scopeContextPromise;
+
+  const dimDetails = t("dimensions").map(function(dim) {
+    const d = scores.dimensions[dim.id];
+    return "- " + d.label + ": " + d.score + "% (weight " + Math.round(d.weight * 100) + "%) | Answers: " + (answers[dim.id] || []).join(",");
+  }).join("\n");
+
+  // Carry forward each dimension's streamed analysis and any follow-up
+  // clarification the user picked, so the final synthesis builds on the
+  // intermediate per-dimension findings rather than re-deriving them blind.
+  const dimNotes = t("dimensions").map(function(dim) {
+    let note = "- " + dim.label + ": " + (dimAnalyses[dim.id] || "(no intermediate analysis)");
+    const followup = dimFollowups[dim.id];
+    if (followup) {
+      note += "\n  Follow-up — " + followup.question + " => " + followup.answer;
+    }
+    return note;
+  }).join("\n");
+
+  const scopeBlock = buildScopeBlock();
+  const langInstr  = t("claude_lang_instruction");
+  const systemPrompt = (scopeBlock ? scopeBlock + "\n\n" : "") +
+    "You are an expert in HR regulatory compliance, specialised in EU Directive 2023/970 on pay transparency.\n" +
+    "You analyse organisational maturity diagnostic results and generate a structured JSON report.\n" +
+    langInstr + "\n" +
+    "ABSOLUTE RULES:\n" +
+    "- Respond ONLY with a valid JSON object. No markdown, no code fences, no text before or after.\n" +
+    "- The JSON must be directly parsable by JSON.parse().\n" +
+    "- Be factual, actionable, and CHRO-oriented.\n" +
+    "- The executive summary, dimension framing, and every recommendation must explicitly reference\n" +
+    "  the organisational scope above (applicable deadlines, transposition status, country-specific\n" +
+    "  rules, and compliance status) — never invent or assume dates not provided there.\n" +
+    "- Build on the per-dimension analysis notes and follow-up clarifications provided below —\n" +
+    "  use them to sharpen the executive summary and recommendations instead of re-deriving\n" +
+    "  conclusions from the raw scores alone.\n" +
+    "- Describe compliance status in plain language for a CHRO audience — never write internal\n" +
+    "  labels such as \"in scope\", \"anticipation phase\" or \"not yet in scope\" as standalone jargon;\n" +
+    "  explain what it means for the organisation instead.";
+
+  const userPrompt = "EU PAY TRANSPARENCY DIAGNOSTIC — " + perimetre.nom + "\n" +
+    "Date: " + perimetre.date + " | Sector: " + perimetre.secteur + "\n" +
+    "Countries: " + Object.keys(perimetre.paysEffectifs).join(", ") + " | Total headcount: " + perimetre.effectifTotal + "\n\n" +
+    "SCORES:\nGlobal weighted score: " + scores.global + "%\n" + dimDetails + "\n\n" +
+    "PER-DIMENSION ANALYSIS NOTES (from intermediate streaming):\n" + dimNotes + "\n\n" +
+    'Generate a JSON report with exactly this structure:\n' +
+    '{\n' +
+    '  "executive_summary": "max 120 words, CHRO tone, mention most exposed country and nearest deadline",\n' +
+    '  "maturity_level": "Exposed|Early stage|Progressing|Advanced (or local equivalent)",\n' +
+    '  "regulatory_risk": "Critical|High|Moderate|Low (or local equivalent)",\n' +
+    '  "strengths": ["string","string"],\n' +
+    '  "recommendations": [\n' +
+    '    {"rank":1,"dimension":"string","action":"string","impact":"High|Medium","timeline":"0-3 months|3-6 months|6-12 months"},\n' +
+    '    {"rank":2,"dimension":"string","action":"string","impact":"High|Medium","timeline":"0-3 months|3-6 months|6-12 months"},\n' +
+    '    {"rank":3,"dimension":"string","action":"string","impact":"High|Medium","timeline":"0-3 months|3-6 months|6-12 months"}\n' +
+    '  ],\n' +
+    '  "sector_benchmark": {\n' +
+    '    "comment": "max 60 words, sector positioning"\n' +
+    '  }\n' +
+    '}';
+
+  try {
+    const endpoint = (USE_PROXY && serverHasKey)
+      ? (API_BASE + "/api/diagnostic")
+      : "https://api.anthropic.com/v1/messages";
+
+    const headers = { "Content-Type": "application/json" };
+    if (!USE_PROXY || !serverHasKey) {
+      headers["x-api-key"]   = apiKey;
+      headers["anthropic-version"] = "2023-06-01";
+      headers["anthropic-dangerous-direct-browser-access"] = "true";
+    }
+
+    const response = await fetch(endpoint, {
+      method:  "POST",
+      headers: headers,
+      body:    JSON.stringify({
+        model:      MODEL,
+        max_tokens: 1500,
+        system:     systemPrompt,
+        messages:   [{ role: "user", content: userPrompt }],
+      }),
+    });
+    if (!response.ok) throw new Error("API " + response.status);
+
+    const data = await response.json();
+    let raw = data.content[0].text.trim();
+    if (raw.startsWith("```")) {
+      const parts = raw.split("```");
+      raw = parts[1] || parts[0];
+      if (raw.startsWith("json")) raw = raw.slice(4);
+    }
+    renderReport(JSON.parse(raw.trim()));
+
+  } catch (err) {
+    console.error(err);
+    goTo("chargement");
+    if (errEl) {
+      errEl.style.display  = "block";
+      errEl.textContent    = t("api_error_msg") + " (" + err.message + ")";
+    }
+  }
+}
+
+// ─── Report rendering ───
+const BAR_COLORS   = { high: "#3B6D11", mid: "#639922", low: "#BA7517", critical: "#A32D2D" };
+const RISQUE_COLORS = { Critical: "#A32D2D", High: "#854F0B", Moderate: "#639922", Low: "#3B6D11" };
+const STATUT_PILLS  = { IN_SCOPE: "pill-red", ANTICIPATION: "pill-amb", NOT_YET_IN_SCOPE: "pill-grn" };
+
+function barColor(score) {
+  if (score >= 75) return BAR_COLORS.high;
+  if (score >= 50) return BAR_COLORS.mid;
+  if (score >= 25) return BAR_COLORS.low;
+  return BAR_COLORS.critical;
+}
+
+function renderReport(report) {
+  goTo("rapport");
+
+  function set(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value;
+  }
+
+  const pays = Object.keys(perimetre.paysEffectifs).join(", ");
+  set("rapport-meta", perimetre.nom + " · " + pays + " · " + perimetre.date);
+  set("r-score",  scores.global);
+  set("r-niveau", report.maturity_level || "—");
+
+  const risk    = report.regulatory_risk || "—";
+  const risqueEl = document.getElementById("r-risque");
+  if (risqueEl) {
+    risqueEl.textContent = risk;
+    const riskKey = Object.keys(RISQUE_COLORS).find(function(k) {
+      return risk.toLowerCase().includes(k.toLowerCase());
+    });
+    risqueEl.style.color = riskKey ? RISQUE_COLORS[riskKey] : "var(--text-s)";
+  }
+
+  const dimsEl = document.getElementById("r-dims");
+  if (dimsEl) {
+    dimsEl.innerHTML = "";
+    t("dimensions").forEach(function(dim) {
+      const d = scores.dimensions[dim.id];
+      if (!d) return;
+      const row = document.createElement("div");
+      row.className = "dim-bar-row";
+      row.innerHTML =
+        '<div class="dim-bar-lbl">' + d.label + "</div>" +
+        '<div class="dim-bar-track"><div class="dim-bar-fill" style="width:' + d.score + '%;background:' + barColor(d.score) + '"></div></div>' +
+        '<div class="dim-bar-pct">' + d.score + "%</div>";
+      dimsEl.appendChild(row);
+    });
+  }
+
+  set("r-synthese", report.executive_summary || "—");
+
+  // Regulatory calendar table — one row per country, populated from the
+  // live-resolved scopeContext (see resolveScopeContext). The table keeps its
+  // original 5-column layout: transposition status and country-specific
+  // rules are combined into the single "Obligation" cell.
+  const calEl = document.getElementById("r-calendrier");
+  if (calEl) {
+    calEl.innerHTML = "";
+    Object.entries(perimetre.paysEffectifs || {}).forEach(function(entry) {
+      const code      = entry[0];
+      const headcount = entry[1];
+      const ctx       = scopeContext[code] || {};
+      const tr          = document.createElement("tr");
+      const pillClass   = STATUT_PILLS[ctx.status] || "pill-grn";
+      const statusLabel = t("status_" + (ctx.status || "").toLowerCase()) || ctx.status || "—";
+      const obligationCell = (ctx.transposition_status || "—") +
+        (ctx.country_specific_rules && ctx.country_specific_rules !== "—" ? " — " + ctx.country_specific_rules : "");
+      tr.innerHTML =
+        "<td><strong>" + countryName(code) + "</strong></td>" +
+        "<td>" + headcount.toLocaleString() + "</td>" +
+        "<td>" + obligationCell + "</td>" +
+        "<td>" + (ctx.applicable_deadline || "—") + "</td>" +
+        '<td><span class="pill ' + pillClass + '">' + statusLabel + "</span></td>";
+      calEl.appendChild(tr);
+    });
+  }
+
+  const recosEl = document.getElementById("r-recos");
+  if (recosEl) {
+    recosEl.innerHTML = "";
+    (report.recommendations || []).forEach(function(r) {
+      const div = document.createElement("div");
+      div.className = "reco-item";
+      div.innerHTML =
+        '<div class="reco-rank">' + r.rank + "</div>" +
+        "<div>" +
+        '<div class="reco-title">' + r.action + "</div>" +
+        '<div class="reco-meta">' + r.dimension + " · " + t("reco_impact") + ": " + r.impact + " · " + r.timeline + "</div>" +
+        "</div>";
+      recosEl.appendChild(div);
+    });
+  }
+
+  const pfEl = document.getElementById("r-points");
+  if (pfEl) {
+    pfEl.innerHTML = "";
+    (report.strengths || []).forEach(function(s) {
+      const div = document.createElement("div");
+      div.className = "point-fort";
+      div.innerHTML = '<span class="point-fort-dot">✓</span><span>' + s + "</span>";
+      pfEl.appendChild(div);
+    });
+  }
+
+  const bench = report.sector_benchmark || {};
+  set("r-bench-txt", bench.comment || "—");
+}
+
+// ─── Reset ───
+function recommencer() {
+  const dims = t("dimensions");
+  if (Array.isArray(dims)) {
+    dims.forEach(function(dim) {
+      answers[dim.id] = new Array(dim.questions.length).fill(null);
+    });
+  }
+  selectedPays.clear();
+  buildCountryChips();
+  const es = document.getElementById("effectif-section");
+  if (es) es.style.display = "none";
+  perimetre  = {};
+  scopeContext        = {};
+  scopeContextPromise = null;
+  currentQ   = 0;
+  currentDim = 0;
+  Object.keys(streamedDims).forEach(function(k) { delete streamedDims[k]; });
+  Object.keys(dimFollowups).forEach(function(k) { delete dimFollowups[k]; });
+  Object.keys(dimAnalyses).forEach(function(k) { delete dimAnalyses[k]; });
+  goTo("accueil");
+}
+
+// ─── Initialise on load ───
+(async function() {
+  await Promise.all([
+    detectServerKey(),
+    loadLocale(currentLang),
+  ]);
+  applyTranslations();
+  buildCountryChips();
+  rebuildQuestionList();
+})();
+
+</script>
+</body>
+</html>
